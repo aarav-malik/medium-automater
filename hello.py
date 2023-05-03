@@ -1,17 +1,16 @@
 import openai
 import requests
 from bs4 import BeautifulSoup
+import os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 
-openai.api_key = "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"
+openai.api_key = "{}".format(os.environ.get('OPENAI_API_KEY'))
 
-def search_popular_topics():
-    # Search for popular topics using Google Trends
-    url = "https://trends.google.com/trends/explore?date=today%201-m&geo=US"
-    response = requests.get(url)
-    soup = BeautifulSoup(response.content, "html.parser")
-    topics = soup.find_all("div", class_="label-text")
-    return [topic.text for topic in topics]
+#def search_popular_topics():
+
 
 
 def generate_article(topic):
@@ -34,7 +33,7 @@ def generate_article(topic):
 def post_article_on_medium(topic, article):
     # Post the article on Medium
     headers = {
-        "Authorization": "Bearer 2ea41f1ec870a60ac24293f8b2a61846e60253baeeb4a4f682ca672dfa2d8aa4f",
+        "Authorization": "Bearer {}".format(os.environ.get('API_KEY')),
         "Content-Type": "application/json",
     }
     data = {
@@ -45,16 +44,14 @@ def post_article_on_medium(topic, article):
         "publishStatus": "draft",
     }
     response = requests.post(
-        "https://api.medium.com/v1/users/1951b0de17806bb4ae5320bab533c6263ad44526daffad10434e0cc2603966c7d/posts", headers=headers, json=data
+        "https://api.medium.com/v1/users/{}/posts".format(os.environ.get('CLIENT_ID')), headers=headers, json=data
     )
     if response.status_code == 201:
         print(f"Article about {topic} posted on Medium!")
     else:
         print(f"Error posting article about {topic} on Medium: {response.text}")
 
-# Search for popular topics
-topics = []
-# Generate an article and post it on Medium for each topic
+topics = ["Hello"]
 for topic in topics:
     article = generate_article(topic)
     post_article_on_medium(topic, article)
